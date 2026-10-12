@@ -5,6 +5,10 @@ module tb_command_controller;
   int errors=0;
   always #5ns clk=~clk;
   command_controller #(.TIMEOUT_CYCLES(4)) dut (.*);
+  command_controller_sva #(.TIMEOUT_CYCLES(4)) checker (
+    .clk, .rst_n, .start, .request_valid, .request_ready,
+    .response_valid, .response_error, .busy, .done, .error
+  );
   task automatic step(input bit s,r,v,e,
                       input bit req,bs,dn,err);
     @(negedge clk);
