@@ -22,14 +22,17 @@ jobs:
             top: tb_programmable_timer
             rtl: day05_counters_timers/rtl/programmable_timer.sv
             tb: day05_counters_timers/tb/tb_programmable_timer.sv
+            checker: ''
           - name: fsm
             top: tb_command_controller
             rtl: day06_fsm_design/rtl/command_controller.sv
             tb: day06_fsm_design/tb/tb_command_controller.sv
+            checker: day06_fsm_design/assertions/command_controller_sva.sv
           - name: mac
             top: tb_pipelined_signed_mac
             rtl: day08_signed_mac/rtl/pipelined_signed_mac.sv
             tb: day08_signed_mac/tb/tb_pipelined_signed_mac.sv
+            checker: day08_signed_mac/assertions/pipelined_mac_sva.sv
     steps:
       - uses: actions/checkout@v4
       - name: Install Verilator
@@ -38,9 +41,15 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          verilator --binary --timing --sv -Wall -Wno-fatal --top-module "${{ matrix.top }}" \
-            "14-days-of-verilog-rtl/${{ matrix.rtl }}" \
+          sources=(
+            "14-days-of-verilog-rtl/${{ matrix.rtl }}"
             "14-days-of-verilog-rtl/${{ matrix.tb }}"
+          )
+          if [[ -n "${{ matrix.checker }}" ]]; then
+            sources+=("14-days-of-verilog-rtl/${{ matrix.checker }}")
+          fi
+          verilator --binary --timing --assert --sv -Wall -Wno-fatal \
+            --top-module "${{ matrix.top }}" "${sources[@]}"
       - name: Run self-checking testbench
         shell: bash
         run: "./obj_dir/V${{ matrix.top }}"
