@@ -6,13 +6,13 @@ The original `7-days-of-rtl` repository contains a separately documented seven-p
 | Day | GitHub files | Simulator run | Status |
 |---|---|---|---|
 | 01–04 | Not published in this folder | Not run | Pending |
-| 05 | RTL, self-checking TB, chapter README | Not run | Draft implementation |
+| 05 | RTL, self-checking TB, SVA, chapter README | Not run | Draft implementation |
 | 06 | RTL, self-checking TB, external SVA, chapter README | Not run | Draft implementation |
 | 07 | Not published | Not run | Pending |
 | 08 | RTL, self-checking TB, external SVA, chapter README | Not run | Draft implementation |
 | 09–14 | Not published | Not run | Pending |
 
-The SystemVerilog simulator (Verilator/Icarus) is not installed in the working container at the time of these commits. Uploaded files are not yet regression-validated. Code and testbench review is not a substitute for simulation; perform lint, compile, directed/random regression, assertion execution and coverage collection before declaring any day verified.
+The SystemVerilog simulators Verilator/Icarus were not available in the working container during this audit. GitHub Actions has been configured to compile and execute all three benches with --assert and their SVA modules, but a successful workflow result has not yet been independently confirmed. Uploaded files are not yet regression-validated. Code and testbench review is not a substitute for simulation; perform lint, compile, directed/random regression, assertion execution and coverage collection before declaring any day verified.
 
 ## Example simulator commands
 From the repository root with Verilator 5.x:
@@ -32,3 +32,6 @@ verilator --binary --timing --sv -Wall -Wno-fatal --top-module tb_pipelined_sign
   14-days-of-verilog-rtl/day08_signed_mac/tb/tb_pipelined_signed_mac.sv
 ./obj_dir/Vtb_pipelined_signed_mac
 ```
+
+## Portfolio audit
+[Profile and repository audit — 2026-10-12](profile_repository_audit_2026-10-12.md)
