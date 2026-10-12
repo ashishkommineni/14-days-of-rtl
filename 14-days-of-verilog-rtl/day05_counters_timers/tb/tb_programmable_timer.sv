@@ -10,6 +10,7 @@ module tb_programmable_timer;
     int errors = 0;
     always #5ns clk = ~clk;
     programmable_timer #(.COUNTER_WIDTH(WIDTH)) dut (.*);
+    programmable_timer_sva #(.COUNTER_WIDTH(WIDTH)) u_assertions (.*);
 
     task automatic cycle(input bit en, input bit rst_phase, input logic [WIDTH-1:0] period);
         @(negedge clk);
