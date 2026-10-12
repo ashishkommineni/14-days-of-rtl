@@ -1,0 +1,46 @@
+name: 14-day RTL learning regression
+
+on:
+  push:
+    paths:
+      - '14-days-of-verilog-rtl/**'
+      - '.github/workflows/rtl-14day-regression.yml'
+  pull_request:
+    paths:
+      - '14-days-of-verilog-rtl/**'
+      - '.github/workflows/rtl-14day-regression.yml'
+  workflow_dispatch:
+
+jobs:
+  verilator:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: timer
+            top: tb_programmable_timer
+            rtl: day05_counters_timers/rtl/programmable_timer.sv
+            tb: day05_counters_timers/tb/tb_programmable_timer.sv
+          - name: fsm
+            top: tb_command_controller
+            rtl: day06_fsm_design/rtl/command_controller.sv
+            tb: day06_fsm_design/tb/tb_command_controller.sv
+          - name: mac
+            top: tb_pipelined_signed_mac
+            rtl: day08_signed_mac/rtl/pipelined_signed_mac.sv
+            tb: day08_signed_mac/tb/tb_pipelined_signed_mac.sv
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Verilator
+        run: sudo apt-get update && sudo apt-get install -y verilator
+      - name: Build self-checking testbench
+        shell: bash
+        run: |
+          set -euo pipefail
+          verilator --binary --timing --sv -Wall -Wno-fatal --top-module "${{ matrix.top }}" \
+            "14-days-of-verilog-rtl/${{ matrix.rtl }}" \
+            "14-days-of-verilog-rtl/${{ matrix.tb }}"
+      - name: Run self-checking testbench
+        shell: bash
+        run: "./obj_dir/V${{ matrix.top }}"
