@@ -22,7 +22,7 @@ jobs:
             top: tb_programmable_timer
             rtl: day05_counters_timers/rtl/programmable_timer.sv
             tb: day05_counters_timers/tb/tb_programmable_timer.sv
-            checker: ''
+            checker: day05_counters_timers/assertions/programmable_timer_sva.sv
           - name: fsm
             top: tb_command_controller
             rtl: day06_fsm_design/rtl/command_controller.sv
