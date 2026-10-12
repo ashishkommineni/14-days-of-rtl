@@ -6,6 +6,10 @@ Seven small RTL projects, each built around one design decision that regularly a
 
 The designs deliberately grow from arithmetic and priority logic into flow control, clock-domain crossing, pipelining, and packet movement. A reader can run the entire repository with one command and then study one project at a time.
 
+## Additional learning curriculum
+
+The original seven executable projects below remain unchanged in scope. A separate, **in-progress** learning curriculum now lives in [14 Days of Verilog/RTL — Concepts and Interviews](14-days-of-verilog-rtl/). It currently publishes timer, FSM and pipelined MAC RTL examples with dedicated self-checking benches and assertions. Its regression results and publication status are tracked independently in [the 14-day verification status](14-days-of-verilog-rtl/docs/verification_status.md); do not treat the original seven-project PASS report as verification of the new lessons.
+
 ## The seven-day path
 
 | Day | Project | Main design idea | Verification focus |
