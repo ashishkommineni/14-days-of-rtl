@@ -14,6 +14,10 @@ module tb_pipelined_signed_mac;
  always #5ns clk=~clk;
  pipelined_signed_mac #(.A_WIDTH(A_WIDTH),.B_WIDTH(B_WIDTH),
     .ACC_WIDTH(ACC_WIDTH),.SATURATE(1'b1)) dut (.*);
+ pipelined_mac_sva #(.A_WIDTH(A_WIDTH), .B_WIDTH(B_WIDTH),
+                     .ACC_WIDTH(ACC_WIDTH)) checker (
+   .clk, .rst_n, .in_valid, .out_valid, .overflow, .result
+ );
  function automatic expected_t ref_mac(input integer signed aa,bb,cc);
    integer signed sum;
    expected_t e;
