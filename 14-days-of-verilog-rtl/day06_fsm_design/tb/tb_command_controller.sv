@@ -5,7 +5,7 @@ module tb_command_controller;
   int errors=0;
   always #5ns clk=~clk;
   command_controller #(.TIMEOUT_CYCLES(4)) dut (.*);
-  command_controller_sva #(.TIMEOUT_CYCLES(4)) checker (
+  command_controller_sva #(.TIMEOUT_CYCLES(4)) u_assertions (
     .clk, .rst_n, .start, .request_valid, .request_ready,
     .response_valid, .response_error, .busy, .done, .error
   );
