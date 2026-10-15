@@ -12,6 +12,7 @@ Stored bits can flip because of radiation, voltage noise, marginal timing, or we
 - A one-bit error in payload, Hamming parity, or overall parity asserts `single_error`; payload is corrected when required.
 - A two-bit error asserts `double_error`; data is reported but must not be trusted.
 - A verification-only injection port XORs a mask into a stored codeword.
+- Stored words are not bulk-reset; software/testbench must initialize an address before reading it, matching common SRAM behavior.
 
 The injection port represents an error-injection hook used during validation. A production macro normally exposes this through DFT, ECC control registers, or a memory-wrapper test mode rather than ordinary functional logic.
 

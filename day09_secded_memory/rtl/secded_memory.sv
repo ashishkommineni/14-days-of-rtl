@@ -98,8 +98,8 @@ module secded_memory #(
             rsp_rdata <= '0;
             single_error <= 1'b0;
             double_error <= 1'b0;
-            for (int address = 0; address < DEPTH; address++)
-                memory[address] <= encode(32'h0);
+            // Storage is intentionally not reset. Real SRAM macros generally do not
+            // provide a bulk reset, and every address is written before use here.
         end else begin
             rsp_valid <= 1'b0;
             single_error <= 1'b0;
