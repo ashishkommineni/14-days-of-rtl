@@ -63,6 +63,10 @@ module tb_axis_width_converter;
         hit_stall=0; hit_last=0; hit_nonlast=0; hit_low=0; hit_high=0;
         repeat (3) @(posedge clk);
         @(negedge clk) reset_n=1;
+        // Cross one active edge with s_valid low so the first driven beat is
+        // recorded by the scoreboard before the DUT can accept it.
+        @(posedge clk);
+        #1;
 
         // Force one packet-ending beat before randomized held-valid traffic.
         pending_valid=1; pending_data=64'h1122_3344_aabb_ccdd; pending_last=1;
