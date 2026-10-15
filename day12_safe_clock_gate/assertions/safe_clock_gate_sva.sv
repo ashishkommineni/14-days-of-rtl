@@ -16,9 +16,14 @@ module safe_clock_gate_sva (
     assert property (@(negedge gated_clk) disable iff (!reset_n)
         !clk);
 
-    // The latched enable may change only during the safe low phase.
-    assert property (@(posedge gate_latched) disable iff (!reset_n) !clk);
-    assert property (@(negedge gate_latched) disable iff (!reset_n) !clk);
+    // The latched enable may change only during the safe low phase.  This is
+    // an immediate assertion intentionally: a concurrent assertion triggered
+    // by gate_latched samples clk in the preponed region and can still see the
+    // value from just before the source-clock falling edge.
+    always @(gate_latched) begin
+        if (reset_n)
+            assert (!clk);
+    end
 
     property p_capture_request;
         @(negedge clk) disable iff (!reset_n)
