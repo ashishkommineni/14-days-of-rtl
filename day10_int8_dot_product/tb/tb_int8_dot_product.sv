@@ -71,6 +71,11 @@ module tb_int8_dot_product;
         for (int lane = 0; lane < LANES; lane++) begin a[lane] = 0; b[lane] = 0; end
         repeat (3) @(posedge clk);
         @(negedge clk) reset_n = 1;
+        // Keep in_valid low through the first active edge.  All later vectors
+        // are presented after a posedge and recorded at the following negedge,
+        // so this alignment prevents an unscored startup acceptance.
+        @(posedge clk);
+        #1;
 
         // Deterministic positive, negative and zero results.
         a[0]=1; a[1]=2; a[2]=3; a[3]=4;
