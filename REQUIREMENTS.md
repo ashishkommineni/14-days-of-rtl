@@ -1,25 +1,37 @@
 # Requirements and portability
 
-## Verified toolchain
+## Portable regression
 
-- SystemVerilog simulator: Verilator 5.49
-- Compiler: a C++20-capable GNU C++ toolchain used by Verilator
-- Build front end: GNU Make and Bash
-- Operating system: Linux
+- Verilator 5.x
+- GNU Make, Bash and a C++20-capable compiler
+- Linux runner (the GitHub Actions workflow installs Verilator on Ubuntu)
+
+Run all projects with `make regression` or one project with `make day DAY=NN`.
 
 ## Cadence Xcelium path
 
-The source uses standard SystemVerilog RTL, unpacked arrays, concurrent assertions, and timing controls. `scripts/run_xcelium.sh` provides an Xcelium command line using `xrun -64bit -sv -assert`. Run it in an environment with a valid Cadence installation and license.
+`make xcelium` calls `xrun -64bit -sv -assert -coverage all`. Xcelium compiles the dedicated Day 08–14 covergroups that are preprocessor-disabled under Verilator. A valid Cadence installation and license are required. Use IMC/vManager for database analysis and merging; do not describe the Xcelium path as executed evidence unless its transcript and tool version are captured.
 
 ## Language boundary
 
-- RTL: `always_ff`, `always_comb`, parameterized widths, packed/unpacked arrays, functions, and SVA.
-- Testbench: tasks, random stimulus, procedural assertions, scoreboards, and delays.
-- No UVM package is required for this repository; the intent is to keep the design behavior visible before introducing a class-based environment.
+- RTL uses synthesizable SystemVerilog: `always_ff`, `always_comb`, parameters, enums, functions, packed/unpacked arrays and generate-time structure.
+- Testbenches use timing controls, tasks/functions, random stimulus, reference queues/arrays, procedural checks and SVA checker modules.
+- No UVM package is required; the goal is to keep each design and checker visible before adding a reusable class-based environment.
 
-## Design assumptions
+## Project assumptions
 
-- Reset assertions are asynchronous; release is driven away from an active clock edge in the supplied tests.
-- Day 5 assumes coordinated reset and source events spaced far enough apart for the destination to observe each toggle.
-- Day 6 requires `ACC_WIDTH >= 2 * OPERAND_WIDTH`.
-- Day 7 expects a ready/valid source to hold a packet until `ready` is observed; its randomized driver follows that rule.
+- Resets assert asynchronously and are released away from active edges in the supplied tests.
+- Day 05 assumes source events are spaced far enough apart for a toggle synchronizer to observe them; implementation sign-off also needs CDC constraints and structural analysis.
+- Day 06 requires accumulator width to accommodate the configured product and accumulation policy.
+- Day 07 sources obey ready/valid and hold an unaccepted packet stable.
+- Day 08 interrupt sources are already synchronous to `pclk`; asynchronous physical sources require CDC front ends.
+- Day 09 models registers as memory. A production implementation may replace them with a macro, pipeline ECC, scrub corrected data and define an uncorrectable-error policy.
+- Day 10 uses 32-bit wrapping arithmetic and four INT8 lanes; it does not claim quantization/saturation accuracy for a trained model.
+- Day 11 assumes all eight input bytes are valid because the teaching interface omits `TKEEP`.
+- Day 12 is a behavioral clock-gating model. ASIC implementation must use an ICG cell; FPGA implementation must use vendor clock enables/buffers.
+- Day 13 demonstrates direction prediction only; target prediction and speculative-history recovery are out of scope.
+- Day 14 permits one outstanding memory read and assumes every accepted request eventually receives exactly one response.
+
+## Sign-off boundary
+
+A green simulation regression validates the documented educational behaviors. It does not replace lint, synthesis, STA, CDC/RDC, DFT, UPF, formal protocol compliance, security review, memory characterization, or physical-design sign-off.

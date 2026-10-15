@@ -1,4 +1,4 @@
-name: RTL regression
+name: 14-day RTL regression
 
 on:
   push:
@@ -17,5 +17,5 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y verilator
-      - name: Run seven-day regression
+      - name: Run fourteen-day regression
         run: make regression
