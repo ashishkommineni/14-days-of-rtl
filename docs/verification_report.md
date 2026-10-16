@@ -2,29 +2,29 @@
 
 ## Latest recorded hosted result
 
-- Date: 2026-10-15
+- Date: 2026-10-16
 - Environment: GitHub Actions, Ubuntu 24.04, Verilator 5.020
 - Compile mode: SystemVerilog, timing enabled, assertions enabled, `-Wall`
-- Repository commit: `4b344536b33363a44e29430bc9157c02109403b5`
+- Repository commit: `886a073a8c41be22c6016974c41e5577b4dad7e9`
 - Result: all fourteen projects passed; no assertion failure or simulation fatal was reported
-- Evidence: [RTL regression run 38706806844](https://github.com/ashishkommineni/14-days-of-rtl/actions/runs/38706806844)
+- Evidence: [RTL regression run 38949766952](https://github.com/ashishkommineni/14-days-of-rtl/actions/runs/38949766952)
 
 | Day | Recorded PASS evidence |
 |---:|---|
-| 1 | `10 NYC clock checks, including both DST boundaries` |
-| 2 | `52 arbitration checks; one-hot and fairness assertions active` |
+| 1 | `11 NYC clock checks, including both DST boundaries` |
+| 2 | `52 arbitration checks; safety SVA and rotating-priority model active` |
 | 3 | `64 register-file transactions with byte bypass` |
 | 4 | `86 cycles, accepted=28 delivered=28, no loss/reorder` |
 | 5 | `6 source events crossed unrelated clocks exactly once` |
 | 6 | `59 pipeline cycles, final signed accumulator=7568` |
 | 7 | `112 cycles, 69 packets routed without loss/reorder` |
-| 8 | `8 APB checks; irq_out=0 pending=0` |
-| 9 | `4 reads; clean/single/parity/double ECC cases covered` |
-| 10 | `54 vectors accepted=54 delivered=54` |
+| 8 | `8 APB checks; read/write/error/IRQ/W1C coverage closed` |
+| 9 | `4 reads; clean/corrected/parity/double-error coverage closed` |
+| 10 | `54 vectors preserved through elastic INT8 pipeline` |
 | 11 | `17 64-bit beats became 34 ordered 32-bit beats` |
-| 12 | `7 full gated pulses; functional and scan paths covered` |
+| 12 | `7 full gated pulses; functional and scan requests covered` |
 | 13 | `89 predictor updates; all state/outcome transitions covered` |
-| 14 | `12-word DMA completed with request/output stalls and error checks` |
+| 14 | `12-word DMA transfer preserved address/data/order under backpressure` |
 
 Randomized totals are deterministic for this recorded simulator build but may change when another simulator uses a different random-number stream. Correctness does not depend on a particular random total: each run recomputes its reference result and checks ordering, latency, or conservation as appropriate.
 
