@@ -81,7 +81,9 @@ module nyc_clock (
         hour_i   = int'(utc_hour);
         minute_i = int'(utc_minute);
 
-        valid_datetime = (year_i >= 1900) &&
+        // This implementation intentionally supports the current US DST policy,
+        // which took effect in 2007. Earlier years used different transition rules.
+        valid_datetime = (year_i >= 2007) &&
                          (month_i >= 1) && (month_i <= 12) &&
                          (day_i >= 1) && (day_i <= days_in_month(year_i, month_i)) &&
                          (hour_i <= 23) && (minute_i <= 59);

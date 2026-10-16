@@ -1,12 +1,14 @@
-# Day 4 — Ready/valid skid buffer
+# Day 4 — One-entry ready/valid elastic buffer
 
 ## What this block does
 
-This one-entry elastic buffer sits between a ready/valid producer and consumer. It accepts data when space is available, holds data stable while the consumer applies backpressure, and sustains one transfer per cycle when dequeue and enqueue happen together.
+This one-entry elastic buffer sits between a ready/valid producer and consumer. It accepts data when space is available, holds data stable while the consumer applies backpressure, and sustains one transfer per cycle when dequeue and enqueue happen together. The directory keeps the commonly used “skid buffer” label, but the implementation is specifically a one-slot elastic register.
 
 ## Why it matters
 
-Ready/valid is simple only when both sides are always ready. Real pipelines stall. A buffer breaks a long combinational path, absorbs one item when readiness changes, and makes the “hold valid and data until accepted” rule explicit.
+Ready/valid is simple only when both sides are always ready. Real pipelines stall. This buffer registers the forward `valid/data` path, stores one item, and makes the “hold valid and data until accepted” rule explicit.
+
+It does **not** fully break the backward ready path: `out_ready` feeds `in_ready` combinationally. A timing-isolating skid buffer normally uses an additional slot or registered-ready architecture so a late downstream stall can be absorbed without a combinational ready chain.
 
 ## Handshake contract
 
@@ -49,13 +51,18 @@ make day DAY=04
 
 > A ready/valid skid buffer stores one transfer and protects the interface during backpressure. I track one `full` bit and a data register. Input ready is high when the slot is empty or when the current output will be consumed, which allows a pop and push on the same edge. If the output is valid but the consumer is not ready, neither the valid bit nor data can change. My testbench uses a FIFO scoreboard and conservation counters, while SVA proves stable output under stall and correct input backpressure.
 
-## Interview questions and concise answers
+## Ten interview questions and concise answers
 
 1. **Can valid depend combinationally on ready?** A source should generate valid independently; otherwise two endpoints can create a combinational loop or deadlock.
 2. **Why is `in_ready = !full || out_ready` useful?** It allows replacement of a consumed item in the same cycle, maintaining one item per cycle throughput.
 3. **What is the buffer latency?** An accepted item becomes registered output data after the active edge; delivery depends on downstream ready.
 4. **How is this different from a two-entry FIFO?** It has one storage slot and simpler pointers, so its capacity is one even though throughput can be one per cycle.
 5. **What must remain stable during a stall?** `out_valid` must stay asserted and `out_data` must not change until accepted.
+6. **Are capacity and throughput the same?** No. Capacity is one stored item; steady-state throughput can still be one transfer per cycle because dequeue and enqueue may occur together.
+7. **Does this RTL break the backward timing path?** No. `in_ready = !full || out_ready` contains a combinational path from downstream ready to upstream ready, even though data and valid are registered.
+8. **What would a fully timing-isolating skid buffer add?** Typically a second storage slot plus registered upstream ready, allowing one extra item to “skid” into storage after backpressure is registered.
+9. **What events must a scoreboard count?** Only `in_valid && in_ready` is accepted and only `out_valid && out_ready` is delivered. Valid or ready alone is not a transfer.
+10. **Which reset corner matters?** After reset the buffer must be empty and must not invent an output; verification should also ensure a previously stalled item is intentionally flushed by reset according to the contract.
 
 ## Common traps
 
@@ -66,4 +73,4 @@ make day DAY=04
 
 ## Revision card
 
-**Transfer:** valid and ready together at the clock edge. **Backpressure rule:** stable valid/data. **Throughput rule:** permit pop and push together. **Proof:** ordered scoreboard plus conservation counts.
+**Transfer:** valid and ready together at the clock edge. **Backpressure rule:** stable valid/data. **Throughput rule:** permit pop and push together. **Timing limit:** backward ready remains combinational. **Proof:** ordered scoreboard plus conservation counts.

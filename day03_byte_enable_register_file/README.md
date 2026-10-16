@@ -54,13 +54,18 @@ make day DAY=03
 
 > I implemented a one-write/two-read register file with byte enables and explicit write-through forwarding. At the active edge, each enabled byte slice is updated independently. Reads are asynchronous. If a read address matches the current write address, I overlay only the enabled write-data bytes onto the stored word; disabled lanes still come from memory. That makes read-during-write behavior deterministic rather than depending on an inferred RAM primitive. The testbench mirrors the memory in a reference model, generates partial and random writes, and assertions check every forwarded byte on both ports.
 
-## Interview questions and concise answers
+## Ten interview questions and concise answers
 
 1. **Why not forward the whole word?** Disabled byte lanes must retain the old stored value.
 2. **What are common read-during-write policies?** Read-first returns old data, write-first returns new data, and no-change holds the previous read output.
 3. **Will this always infer a block RAM?** No. Asynchronous dual reads, reset clearing, and byte-level bypass may map to flops or distributed RAM depending on the technology.
 4. **Why is reset-clearing a large memory expensive?** It creates reset logic for every stored bit unless the target memory primitive supports it.
 5. **How would you add ECC?** Store/check code bits per word, define how partial writes perform read-modify-write, and verify correctable/uncorrectable error behavior.
+6. **What is the byte-merge equation for one lane?** `next_byte = byte_en ? wr_data_byte : old_byte`; the full word is the concatenation of that decision for every lane.
+7. **What hardware cost comes with two asynchronous read ports?** A flop-based implementation needs two read mux trees, while a memory implementation may require a true multi-port macro, replication, or a different synchronous-read contract.
+8. **Why is explicit forwarding preferable to relying on RAM collision behavior?** Read-during-write behavior varies across inferred memories and libraries. A bypass defines a portable architectural result at the interface.
+9. **Which parameter constraints should be documented?** `DATA_WIDTH` must be positive and divisible by eight, address width must be positive, and the modeled depth is `2**ADDR_WIDTH`.
+10. **What should the scoreboard model first on a write edge?** It should compare any specified pre-edge combinational bypass behavior, then commit enabled bytes to its reference memory for subsequent cycles.
 
 ## Common traps
 

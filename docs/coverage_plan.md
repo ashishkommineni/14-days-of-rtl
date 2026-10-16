@@ -1,6 +1,6 @@
 # Cross-project coverage plan
 
-Coverage is tied to named requirements rather than an unexplained percentage. Each project combines directed corners, randomized/reference-model comparison where useful, continuous assertions, and end-of-test coverage gates. Days 08–14 additionally provide Xcelium covergroups.
+Coverage is tied to named requirements rather than an unexplained percentage. Each project combines directed corners, randomized/reference-model comparison where useful, and continuous assertions. Days 01–07 demonstrate scenario closure through exact test checks, scoreboards, or conservation counters. Days 08–14 additionally provide explicit portable end-of-test coverage gates and Xcelium covergroups.
 
 | Day | Required scenario coverage | Continuous checking | End-to-end proof |
 |---:|---|---|---|
@@ -21,8 +21,8 @@ Coverage is tied to named requirements rather than an unexplained percentage. Ea
 
 ## Coverage closure rule
 
-A PASS line is printed only after all required directed bins are marked and every scoreboard/conservation check succeeds. Random stimulus is not accepted as evidence that a corner probably occurred; required corners are forced explicitly or checked by a coverage gate.
+For Days 01–07, a PASS line is printed only after the listed directed checks and any scoreboard/conservation checks succeed. For Days 08–14, the testbench also requires every named portable coverage flag before printing PASS. Random stimulus is not accepted as evidence that a corner probably occurred; required corners are forced explicitly.
 
 ## Tool-specific evidence
 
-Verilator CI proves compilation, SVA execution supported by the chosen tool, directed/random test completion and coverage-gate closure. Xcelium can additionally collect covergroup, assertion and code coverage. Record the simulator version, seed, command, merged database scope, exclusions and uncovered rationale before quoting a numerical percentage.
+Verilator CI proves compilation, execution of the supported inline/concurrent assertions, and completion of the self-checking tests. It also proves portable coverage-gate closure where those gates exist (Days 08–14). Xcelium can additionally collect covergroup, assertion and code coverage. Record the simulator version, seed, command, merged database scope, exclusions and uncovered rationale before quoting a numerical percentage. No Xcelium coverage percentage is claimed in this repository yet.

@@ -58,6 +58,7 @@ module tb_nyc_clock;
         check_time(2024, 3, 1, 3,  5, 1, 0, 2024, 2, 29, 22,  5, "leap borrow");
         check_time(2026, 2, 29, 12, 0, 0, 0, 0, 0, 0, 0, 0, "invalid non-leap day");
         check_time(2026, 13, 1, 12, 0, 0, 0, 0, 0, 0, 0, 0, "invalid month");
+        check_time(2006, 7, 1, 12, 0, 0, 0, 0, 0, 0, 0, 0, "unsupported historical rule");
         $display("[DAY 1] PASS: %0d NYC clock checks, including both DST boundaries", checks);
         $finish;
     end

@@ -34,7 +34,7 @@ For `N=4` and `last_grant=1`, request mask `1011` is examined in the order `2,3,
 
 ## Verification
 
-The testbench maintains an independent software-style rotating-priority model. It checks two complete full-contention rotations, idle, sparse masks, a single requester, and 40 random request masks. SVA continuously proves one-hot-or-idle behavior, grant/request correspondence, and no grant while idle.
+The testbench maintains an independent software-style rotating-priority model. It checks two complete full-contention rotations, idle, sparse masks, a single requester, and 40 random request masks. SVA continuously proves one-hot-or-idle behavior, grant/request correspondence, and no grant while idle. Fair rotation is checked by the directed rotations and cycle-by-cycle model; the RTL does not claim an unbounded temporal fairness proof.
 
 ```bash
 make day DAY=02
@@ -44,13 +44,18 @@ make day DAY=02
 
 > A round-robin arbiter prevents starvation by making the priority order depend on the previous winner. My combinational logic scans all requesters starting just after `last_grant`, selects the first active request, and emits a one-hot grant. On the clock edge, I update `last_grant` only when someone wins, so idle cycles do not change fairness. Reset initializes the pointer so requester zero wins first. I verify it with an independent rotating-priority model plus assertions that the grant is one-hot-or-zero and always a subset of the request vector.
 
-## Interview questions and concise answers
+## Ten interview questions and concise answers
 
 1. **Can round-robin guarantee a fixed latency?** With `N` continuously requesting clients and one grant per cycle, a client waits at most `N−1` grants, assuming service never stalls.
 2. **Why not update the pointer every cycle?** Idle cycles would change priority without service and make behavior harder to reason about.
 3. **What if `N` is not a power of two?** The explicit comparison/subtraction wraps at `N`; unused binary pointer values are never intentionally loaded.
 4. **Is a grant the same as a completed transfer?** Not always. In a ready/valid system, fairness state normally advances on an accepted transfer, not merely arbitration.
 5. **How would weighted round-robin differ?** Each client receives a programmable number of service credits before priority advances.
+6. **Why use a one-hot grant instead of a binary winner index?** One-hot connects naturally to per-client enables and makes exclusivity easy to assert; a binary index uses fewer wires but needs a separate valid bit and decode logic.
+7. **What is the purpose of the `found` flag in the scan?** It remembers that an earlier requester in the current priority order already won, preventing later active requesters from receiving a second grant.
+8. **Does `$onehot0(grant)` prove fairness?** No. It proves only zero-or-one asserted grant bits. Fairness also depends on pointer state, request persistence, and the definition of service.
+9. **How should this arbiter change if the selected client can be backpressured?** Add an acceptance signal and update `last_grant` only on a completed grant/accept handshake; otherwise a client could consume priority without receiving service.
+10. **How would you verify starvation freedom?** Under an explicit assumption that a request stays asserted and service remains available, track each requester's wait count and prove or check that it is granted within at most `N` service opportunities.
 
 ## Common traps
 

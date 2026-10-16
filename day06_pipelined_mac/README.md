@@ -42,13 +42,18 @@ make day DAY=06
 
 > My MAC has a registered signed product stage and an accumulation stage. The two W-bit signed operands create a 2W-bit product, which I explicitly sign-extend to the accumulator width before addition. A valid bit travels with the product so bubbles do not update the sum, and `out_valid` identifies the cycle containing the new accumulated result. Clear resets the accumulator and flushes the pending product. The bench models both the arithmetic and latency cycle by cycle, including signed corner values and random bubbles.
 
-## Interview questions and concise answers
+## Ten interview questions and concise answers
 
 1. **Why is the product `2W` bits?** Multiplying two W-bit values can require up to 2W result bits, including signed range.
 2. **Why explicitly sign-extend?** Zero extension would turn a negative product into a large positive addend.
 3. **What happens on accumulator overflow?** This implementation wraps in two's-complement width. Saturation would require overflow detection and clamp logic.
 4. **Why pipeline a MAC?** Registers shorten combinational paths and raise frequency, at the cost of latency and valid/control tracking.
 5. **What does clear do to an in-flight product?** It flushes it by clearing `valid_s1`; the product is not accumulated later.
+6. **What are this pipeline's latency and throughput?** An accepted product updates the visible result one cycle later, while a new product can be accepted every cycle; latency is one registered product stage and throughput is one operation per cycle after fill.
+7. **Why must valid be pipelined with the product?** Without `valid_s1`, a bubble could accidentally reuse stale product data or an output-valid pulse could be associated with the wrong operation.
+8. **Why does clear take priority over input valid?** The contract defines clear as a flush. Accepting a new input on the same edge would make reset-of-accumulator semantics ambiguous.
+9. **How do you choose accumulator width?** Bound the maximum product magnitude and number of accumulated terms, then add guard bits; this RTL also requires `ACC_WIDTH >= 2*OPERAND_WIDTH` for its explicit sign extension.
+10. **How would you verify a saturating variant?** Use a wider reference accumulator, clamp against signed min/max, and force positive and negative overflow crossings plus values exactly at both limits.
 
 ## Common traps
 

@@ -54,13 +54,18 @@ make day DAY=07
 
 > I designed a two-input, two-output ready/valid router. Each input provides a destination bit; each output arbitrates only the inputs targeting it. To preserve the interface during backpressure, every output has a one-entry elastic buffer. If the buffer is empty or being consumed, arbitration can accept a replacement. Dual requests use per-output round-robin history, updated only on acceptance. The testbench has separate output scoreboards, holds blocked source packets correctly, checks contention and stalls, and finishes with packet-conservation and ordering checks.
 
-## Interview questions and concise answers
+## Ten interview questions and concise answers
 
 1. **Why is arbitration per output?** Inputs targeting different outputs should proceed simultaneously; a global arbiter would unnecessarily serialize them.
 2. **Why update fairness on acceptance?** A selection that cannot enter the output buffer has not received service.
 3. **How does the design keep output stable under stall?** Full output buffers disable replacement until the current item is consumed.
 4. **Can head-of-line blocking occur?** With no input queues, a held packet blocks that source from presenting another destination. Deeper virtual/output queues address larger-router HOL effects.
 5. **How would this scale to N×M?** Build an M-way arbitration decision per output plus logic ensuring each input is granted at most once; complexity and timing grow quickly.
+6. **What is the maximum aggregate throughput?** Two packets per cycle when the two inputs target different ready outputs; contention for one output limits that destination to one packet per cycle.
+7. **Why can both outputs arbitrate independently here?** Each input carries exactly one destination bit, so it can request only one output in a cycle and cannot be double-granted.
+8. **What conservation property should be checked?** Outside reset/flush, total delivered packets plus packets currently buffered must equal total accepted packets, with separate ordered queues per destination.
+9. **What fairness property is actually required?** If both inputs continuously request the same available output, accepted winners must alternate; history should advance only on a real acceptance.
+10. **What changes if packets have multiple flits?** Arbitration normally locks an output to a packet until its tail flit, and verification must check packet integrity, lock release, backpressure, and fairness between packets rather than individual flits.
 
 ## Common traps
 

@@ -73,7 +73,7 @@ module tb_round_robin_arbiter;
         for (int test = 0; test < 40; test++)
             apply_and_check(N'($urandom()), "random request");
 
-        $display("[DAY 2] PASS: %0d arbitration checks; one-hot and fairness assertions active", checks);
+        $display("[DAY 2] PASS: %0d arbitration checks; safety SVA and rotating-priority model active", checks);
         $finish;
     end
 endmodule

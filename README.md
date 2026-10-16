@@ -1,6 +1,6 @@
 # 14 Days of RTL
 
-[![14-day RTL regression](https://github.com/ashishkommineni/7-days-of-rtl/actions/workflows/rtl-regression.yml/badge.svg)](https://github.com/ashishkommineni/7-days-of-rtl/actions/workflows/rtl-regression.yml)
+[![14-day RTL regression](https://github.com/ashishkommineni/14-days-of-rtl/actions/workflows/rtl-regression.yml/badge.svg)](https://github.com/ashishkommineni/14-days-of-rtl/actions/workflows/rtl-regression.yml)
 
 Fourteen self-contained RTL projects that progress from control and storage fundamentals to CDC, streaming, reliability, low power, AI arithmetic, processor prediction, and a DMA capstone. Every day contains a behavioral contract, synthesizable SystemVerilog, a self-checking testbench, executable assertions/coverage goals, expected output, engineering explanation, common failures, and ten interview questions with answers.
 
@@ -13,7 +13,7 @@ This is a project series, not a collection of copied syntax snippets. The verifi
 | 01 | [New York clock with DST](day01_nyc_clock) | Calendar arithmetic and daylight-saving boundaries | Transition dates, leap-year borrow, invalid input |
 | 02 | [Parameterized round-robin arbiter](day02_round_robin_arbiter) | Fair rotating priority | Sparse/full contention, one-hot grants, fairness |
 | 03 | [Byte-enable register file](day03_byte_enable_register_file) | Partial writes and forwarding | Per-byte merge, two read ports, random model |
-| 04 | [Ready/valid skid buffer](day04_ready_valid_skid_buffer) | Elastic flow control | Stall stability, no loss or reordering |
+| 04 | [One-entry ready/valid elastic buffer](day04_ready_valid_skid_buffer) | Elastic flow control | Stall stability, no loss or reordering |
 | 05 | [CDC pulse synchronizer](day05_cdc_pulse_synchronizer) | Toggle-based event transfer | Unrelated clocks and event conservation |
 | 06 | [Signed pipelined MAC](day06_pipelined_mac) | Valid tracking and sign extension | Bubbles, signed corners, flush and arithmetic model |
 | 07 | [Buffered 2×2 packet router](day07_two_by_two_router) | Arbitration plus output buffering | Contention, backpressure and packet conservation |
@@ -31,13 +31,13 @@ This is a project series, not a collection of copied syntax snippets. The verifi
 dayNN_project/
 ├── rtl/                  # synthesizable design
 ├── tb/                   # self-checking testbench and reference model
-├── assertions/           # separate SVA checker where applicable
-├── coverage/             # Xcelium covergroup model where applicable
+├── assertions/           # separate SVA checker on Days 08–14 (inline before that)
+├── coverage/             # Xcelium covergroup on Days 08–14 (portable gates before that)
 ├── README.md             # specification, flow, use, traps and 10 Q&A
 └── expected_output.md    # observable pass signature
 ```
 
-Days 01–07 keep assertions and portable scenario coverage close to their original RTL/testbench. Days 08–14 expose dedicated assertion and covergroup modules. All projects also use end-of-test coverage gates, so a test fails if its required scenarios were not exercised.
+Days 01–07 keep assertions in the RTL and prove scenario coverage through directed checks, reference models, and conservation counters in the testbench. Days 08–14 add dedicated assertion modules, Xcelium covergroups, and explicit portable end-of-test coverage gates. The [coverage plan](docs/coverage_plan.md) states the exact evidence available for each day.
 
 ## Run the complete regression
 

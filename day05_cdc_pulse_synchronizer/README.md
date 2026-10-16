@@ -37,13 +37,18 @@ make day DAY=05
 
 > A single-cycle pulse can be missed when crossing to an unrelated clock, so I encode the event as a toggle in the source domain. The toggle persists, crosses a two-flop synchronizer, and is compared with a delayed copy in the destination; their XOR creates one destination-cycle pulse. The first synchronizer flop may go metastable, while downstream logic only uses the second stage. This method has a rate limit: the source must not toggle twice before the destination observes the first change. For higher rates or payload transfer I would use a request/acknowledge handshake or async FIFO.
 
-## Interview questions and concise answers
+## Ten interview questions and concise answers
 
 1. **Does a two-flop synchronizer eliminate metastability?** No. It reduces the probability that metastability propagates by giving the first stage time to resolve.
 2. **Why not synchronize the pulse directly?** A narrow pulse may occur entirely between destination edges.
 3. **Can back-to-back source events be lost?** Yes. Two toggles before observation can cancel and appear as no change.
 4. **Why should only the second stage feed logic?** Using the first stage exposes functional logic to metastability risk and routing variation.
 5. **How do you cross a multi-bit bus?** Use a coherent protocol: handshake-held data, Gray-coded pointers for FIFOs, or another reviewed CDC structure—not independent bit synchronizers.
+6. **Why does XOR recreate a pulse?** The synchronized toggle and its one-cycle delayed copy differ for exactly one destination cycle whenever one new toggle transition is observed.
+7. **What limits the event rate?** The source must leave enough time for each toggle state to pass through the destination synchronizer and be sampled before the next toggle; otherwise an even number of unseen changes can cancel.
+8. **Can independent resets create a false event?** Yes. If the source toggle and destination history reset to different logical states or release asynchronously, the XOR can interpret reset convergence as an event. Reset sequencing must be part of the CDC contract.
+9. **Does the `ASYNC_REG` attribute complete CDC sign-off?** No. It guides implementation, but the design still needs recognized CDC structure, placement/timing constraints, reset analysis, and tool review.
+10. **When is a request/acknowledge handshake better?** Use it when every event must be delivered regardless of clock ratio and the source can wait for acknowledgement; it adds round-trip latency but provides explicit backpressure.
 
 ## Common traps
 
