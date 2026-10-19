@@ -41,7 +41,9 @@ When `in_ready` is true, the next occupancy becomes `in_valid`. Data is captured
 
 The scoreboard records every accepted input and compares every delivered output in FIFO order. Directed cases exercise empty load, full stall, simultaneous pop/push, stable hold, and drain. Eighty randomized ready/valid cycles follow, then the bench drains the buffer and proves `accepted == delivered`.
 
-SVA checks that a stalled output remains valid with stable data and that a full, blocked buffer deasserts `in_ready`. A cover property identifies a full-throughput simultaneous dequeue/enqueue cycle.
+The stimulus behaves as a protocol-compliant producer: once it presents a valid item while `in_ready` is low, it retains both `in_valid` and `in_data` until acceptance. An environment-side assertion checks this assumption, preventing randomized stimulus from silently changing an unaccepted transaction.
+
+DUT SVA checks that a stalled output remains valid with stable data and that a full, blocked buffer deasserts `in_ready`. A cover property identifies a full-throughput simultaneous dequeue/enqueue cycle.
 
 ```bash
 make day DAY=04
