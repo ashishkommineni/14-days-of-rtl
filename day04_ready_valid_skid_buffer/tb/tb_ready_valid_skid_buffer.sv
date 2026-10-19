@@ -14,6 +14,7 @@ module tb_ready_valid_skid_buffer;
     logic [DW-1:0] expected [0:255];
     int read_ptr, write_ptr, count;
     int accepted, delivered, cycles;
+    bit source_stalled;
 
     ready_valid_skid_buffer #(.DATA_WIDTH(DW)) dut (.*);
     initial begin
@@ -27,12 +28,18 @@ module tb_ready_valid_skid_buffer;
         input bit drive_ready,
         input string label
     );
+        bit stalled_this_cycle;
         begin
             @(negedge clk);
-            in_valid = drive_valid;
-            in_data  = drive_data;
+            // A ready/valid producer must retain an unaccepted item. New
+            // requested stimulus is applied only after the pending item moves.
             out_ready = drive_ready;
+            if (!source_stalled) begin
+                in_valid = drive_valid;
+                in_data  = drive_data;
+            end
             #1;
+            stalled_this_cycle = in_valid && !in_ready;
 
             if (out_valid && out_ready) begin
                 assert (count > 0) else $fatal(1, "%s: DUT produced an unexpected item", label);
@@ -51,6 +58,7 @@ module tb_ready_valid_skid_buffer;
 
             @(posedge clk);
             #1;
+            source_stalled = stalled_this_cycle;
             cycles++;
             assert (out_valid === (count != 0))
                 else $fatal(1, "%s: occupancy/valid mismatch count=%0d", label, count);
@@ -60,10 +68,16 @@ module tb_ready_valid_skid_buffer;
         end
     endtask
 
+    property p_source_holds_while_blocked;
+        @(posedge clk) disable iff (!reset_n)
+            (in_valid && !in_ready) |=> (in_valid && $stable(in_data));
+    endproperty
+    assert property (p_source_holds_while_blocked);
+
     initial begin
         reset_n = 0; in_valid = 0; in_data = '0; out_ready = 0;
         read_ptr = 0; write_ptr = 0; count = 0;
-        accepted = 0; delivered = 0; cycles = 0;
+        accepted = 0; delivered = 0; cycles = 0; source_stalled = 0;
         repeat (2) @(posedge clk);
         @(negedge clk) reset_n = 1;
 

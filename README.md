@@ -6,6 +6,8 @@ Fourteen self-contained RTL projects that progress from control and storage fund
 
 This is a project series, not a collection of copied syntax snippets. The verification rule is simple: a project passes only when its testbench can decide correctness without manual waveform inspection and the full hosted regression is green.
 
+The fourteen root `dayNN_*` directories are the single canonical series. A retired partial draft tree was removed so reviewers see one consistent implementation and one regression path. See the [completion matrix](docs/completion_matrix.md) for the requirement-to-evidence summary.
+
 ## Project path
 
 | Day | Project | Engineering focus | Verification focus |

@@ -14,6 +14,15 @@ if grep -Rq 'ashishkommineni/7-days-of-rtl' README.md docs .github 2>/dev/null; 
     exit 1
 fi
 
+[[ ! -d 14-days-of-verilog-rtl ]] || {
+    echo "Found retired duplicate 14-days-of-verilog-rtl tree"
+    exit 1
+}
+[[ ! -f .github/workflows/rtl-14day-regression.yml ]] || {
+    echo "Found retired partial-series workflow"
+    exit 1
+}
+
 for number in 01 02 03 04 05 06 07 08 09 10 11 12 13 14; do
     day_dir=$(find . -maxdepth 1 -type d -name "day${number}_*" -print -quit)
     [[ -n "${day_dir}" ]] || { echo "Missing day ${number}"; exit 1; }
